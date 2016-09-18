@@ -1,70 +1,163 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <!-- Include Required Prerequisites -->
+    <script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1/jquery.min.js"></script>
+    <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.css" />
+
+    <!-- Include Date Range Picker -->
+    <script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+    <link href="css/styles.css" rel="stylesheet" />
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.4.0/firebase.js"></script>
+    <script>
+        // Initialize Firebase
+        var config = {
+            apiKey: "AIzaSyClUzv3AI-_02cFQVVOnU0BzaPDsJ3bcOE",
+            authDomain: "midfare-2f172.firebaseapp.com",
+            databaseURL: "https://midfare-2f172.firebaseio.com",
+            storageBucket: "midfare-2f172.appspot.com",
+            messagingSenderId: "432919879321"
+        };
+        firebase.initializeApp(config);
+
+        function writeUserData(userId, name, email, imageUrl) {
+            firebase.database().ref('users/' + userId).set({
+                username: name,
+                email: email,
+                profile_picture: imageUrl
+            });
+        }
+
+
+        $.getJSON('https://api.sandbox.amadeus.com/v1.2/flights/inspiration-search?apikey=Bl4sjnCvGg6nf0cXksRrbVhczymgAQRo&origin=BOS', function (data) {
+            console.log(data);
+            firebase.database().ref("test1").set(data);
+
+        });
+
+
+        $(function () {
+            $('input[name="daterange"]').daterangepicker();
+        });
+
+        $(function () {
+            function log(message) {
+                $("<div>").text(message).prependTo("#log");
+                $("#log").scrollTop(0);
+            }
+            $("#city1").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "https://api.sandbox.amadeus.com/v1.2/airports/autocomplete",
+                        dataType: "json",
+                        data: {
+                            apikey: "Bl4sjnCvGg6nf0cXksRrbVhczymgAQRo",
+                            term: request.term
+                        },
+                        success: function (data) {
+                            response(data);
+                        }
+                    });
+                },
+                minLength: 3,
+                select: function (event, ui) {
+                    log(ui.item ?
+                        "Selected: " + ui.item.label :
+                        "Nothing selected, input was " + this.value);
+                },
+                open: function () {
+                    $(this).removeClass("ui-corner-all").addClass("ui-corner-top");
+                },
+                close: function () {
+                    $(this).removeClass("ui-corner-top").addClass("ui-corner-all");
+                }
+            })
+            $("#city2").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "https://api.sandbox.amadeus.com/v1.2/airports/autocomplete",
+                        dataType: "json",
+                        data: {
+                            apikey: "Bl4sjnCvGg6nf0cXksRrbVhczymgAQRo",
+                            term: request.term
+                        },
+                        success: function (data) {
+                            response(data);
+                        }
+                    });
+                },
+                minLength: 3,
+                select: function (event, ui) {
+                    log(ui.item ?
+                        "Selected: " + ui.item.label :
+                        "Nothing selected, input was " + this.value);
+                },
+                open: function () {
+                    $(this).removeClass("ui-corner-all").addClass("ui-corner-top");
+                },
+                close: function () {
+                    $(this).removeClass("ui-corner-top").addClass("ui-corner-all");
+                }
+            });
+        });
+    </script>
     <meta charset="utf-8">
     <title>Welcome to Firebase Hosting</title>
-    <style media="screen">
-      body {
-        font-family: Roboto, Arial, sans-serif;
-        background: #ECEFF1;
-        color: rgba(0,0,0,0.87);
-      }
+</head>
 
-      a {
-        color: rgb(3,155,229);
-      }
+<body>
 
-      #message {
-        max-width: 400px;
-        margin: 40px auto;
-        box-shadow: 0 1px 3px 0 rgba(0,0,0,0.2),0 1px 1px 0 rgba(0,0,0,0.14),0 2px 1px -1px rgba(0,0,0,0.12);
-        border-radius: 2px;
-        background: white;
-        padding: 16px 24px;
-      }
-
-      #message h1 {
-        font-size: 22px;
-        font-weight: 500;
-        text-align: center;
-        margin: 0 0 16px;
-      }
-
-      #message p {
-        font-weight: 300;
-        line-height: 150%;
-      }
-
-      #message ul {
-        list-style: none;
-        margin: 16px 0 0;
-        padding: 0;
-        text-align: center;
-      }
-
-      #message li a {
-        display: inline-block;
-        padding: 8px;
-        text-transform: uppercase;
-        text-decoration: none;
-        font-weight: 500;
-        background: rgb(3,155,229);
-        color: white;
-        border: 1px solid rgb(3,155,229);
-        border-radius: 3px;
-        font-size: 14px;
-        box-shadow: 0 2px 5px 0 rgba(0,0,0,.26);
-      }
-    </style>
-  </head>
-  <body>
-    <div id="message">
-      <h1>Welcome to Firebase Hosting</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <ul>
-        <li><a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a></li>
-      </ul>
+    <div class="jumbotron text-center">
+        <h1>Midfare</h1>
+        <p>Find the best flights to meet your far-apart friends</p>
     </div>
-      
-  </body>
+
+    <div class="container">
+        <div class="row">
+            <form role="form">
+                <div class="col-sm-5 col-md-4 col-lg-3">
+                    <div class="form-group">
+                        <label for="city1">Your City:</label>
+                        <input type="text" class="form-control" id="city1" placeholder="ATL">
+                    </div>
+                </div>
+                <div class="col-sm-5 col-md-4 col-lg-3">
+                    <div class="form-group">
+                        <label for="city2">Your Friend's City:</label>
+                        <input type="text" class="form-control" id="city2" placeholder="SEA">
+                    </div>
+                </div>
+                <div class="col-sm-2 col-md-4 col-lg-3">
+                    <div class="form-group">
+                        <label for="date">Departure Date :</label>
+                        <input type="text" name="daterange" class="form-control" placeholder="Select Date" />
+                    </div>
+                </div>
+                <div>
+                    Powered by <a href="http://sandbox.amadeus.com">Amadeus Travel Innovation Sandbox</a>
+                </div>
+                <div class="ui-widget" style="margin-top:2em; font-family:Arial">
+                    Result:
+                    <div id="log" style="height: 200px; width: 300px; overflow: auto;" class="ui-widget-content"></div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+
+
+
+
+</body>
+
 </html>
