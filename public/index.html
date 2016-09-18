@@ -14,7 +14,7 @@
 
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
-    <link href="css/styles.css" rel="stylesheet" />
+    <link href="styles.css" rel="stylesheet" />
 
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/3.4.0/firebase.js"></script>
@@ -73,6 +73,8 @@
             });
         });
 
+        var data1;
+        var data2;
 
         function myFunction() {
             var date1 = new Date($("#date1").val());
@@ -83,8 +85,7 @@
             var city2 = $("#city2").val()
             console.log(d1);
             console.log(d2);
-            var data1;
-            var data2;
+
 
             var url1 = "https://api.sandbox.amadeus.com/v1.2/flights/inspiration-search?apikey=Bl4sjnCvGg6nf0cXksRrbVhczymgAQRo&origin=" + $("#city1").val() + "&max_price=" + $("#budget1").val() + "&departure_date=" + d1 + "--" + d2;
             var url2 = "https://api.sandbox.amadeus.com/v1.2/flights/inspiration-search?apikey=Bl4sjnCvGg6nf0cXksRrbVhczymgAQRo&origin=" + $("#city2").val() + "&max_price=" + $("#budget2").val() + "&departure_date=" + d1 + "--" + d2;
@@ -98,22 +99,57 @@
                 firebase.database().ref(city2).set(data);
             })
 
-            firebase.database().ref(city1).once('value', function (snapshot) {
-                data1 = snapshot.val();
-            }).then(function () {
+            .then(function () {
                 console.log(data1);
             });
 
-            firebase.database().ref(city2).once('value', function (snapshot) {
-                data2 = snapshot.val();
-            }).then(function () {
-                console.log(data2);
-            });
-            var array = [];
-            for (var i = 0; i < data.results.length; i++) {
-                console.log(data1.results[i]);
-            }
+            $('#matches').html("");
 
+            Promise.all([
+                firebase.database().ref(city1).once('value', function (snapshot) {
+                    data1 = snapshot.val();
+                }),
+                firebase.database().ref(city2).once('value', function (snapshot) {
+                    data2 = snapshot.val();
+                })
+            ]).then(function () {
+                console.log(data2);
+                var same = [];
+                for (var i = 0; i < data1.results.length; i++) {
+                    var obj = {
+                        first: i,
+                        second: -1,
+                        destination: data1.results[i].destination,
+                        firstFrom: data1.origin,
+                        secondFrom: data2.origin,
+                        firstPrice: data1.results[i].price,
+                        secondPrice: -1,
+                        total: -1,
+                        firstAL: data1.results[i].airline,
+                        secondAL: -1
+                    }
+                    same.push(obj);
+                }
+                for (var i = 0; i < data2.results.length; i++) {
+                    for (var j = 0; j < same.length; j++) {
+                        if (same[j].destination.localeCompare(data2.results[i].destination) == 0) {
+                            same[j].second = i;
+                            same[j].secondPrice = data2.results[i].price;
+                            same[j].total = parseFloat(parseFloat(same[j].secondPrice) + parseFloat(same[j].firstPrice)).toFixed(2);
+                            same[j].secondAL = data2.results[i].airline;
+                        }
+                    }
+                }
+                same.sort(function (a, b) {
+                    return (a.total - b.total);
+                });
+
+                for (var i = 0; i < same.length; i++) {
+                    if (same[i].second != -1) {
+                        $('.matches').append("<div class=\"row\">" + "<div class=\"col-lg-4\">" + "<p class=\"lead\"> From: " + same[i].firstFrom + "  <br>Price: " + same[i].firstPrice + "<br>Airline: " + same[i].firstAL + < /p></div > " + " < div class = \"col-lg-4\"> <p class=\"lead\">" + "Total : " + same[i].total + "<br>Destination: " + same[i].destination + "</p></div>" + "<div class=\"col-lg-4\" align=\"right\"> <p class=\"lead\"> Price: " + "\t " + same[i].secondPrice + "\t <br>From: " + same[i].secondFrom + "<br>Airline: " + same[i].firstAL + "</p></div> " + " </div>");
+                    }
+                }
+            });
         }
     </script>
     <meta charset="utf-8">
@@ -121,11 +157,15 @@
 </head>
 
 <body>
+    <header>
+        <div class="container">
+            <div class="intro-text">
+                <div class="intro-heading"><img class="logo" src="img/midfair%20logo%20(2).png"></div>
+                <div class="intro-lead-in">Find a way to meet, no matter where you may be.</div>
+            </div>
+        </div>
+    </header>
 
-    <div class="jumbotron text-center">
-        <h1>Midfare</h1>
-        <p>Find the best flights to meet your far-apart friends</p>
-    </div>
 
     <div class="container">
         <div class="row">
@@ -155,6 +195,10 @@
 
             <button style="margin:10px" type="button" class="btn btn-primary btn-lg btn-block" onclick="myFunction();">Find Midfare</button>
         </div>
+        <div class="matches">
+
+        </div>
+
     </div>
 
 

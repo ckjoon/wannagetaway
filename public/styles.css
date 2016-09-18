@@ -51,15 +51,15 @@ html {
 }
 
 header {
-    background-image: url(/image/landing.jpg);
-    background-color: rgba(0, 0, 0, .7);
+    background-image: url(img/pexels-photo-89485.jpeg);
+    background-color: rgba(255, 255, 2555, .8);
     background-repeat: none;
     background-attachment: scroll;
     background-position: center center;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     background-size: cover;
-    -o-background-size: cover
+    -o-background-size: cover;
 }
 
 header .intro-text {
@@ -68,8 +68,7 @@ header .intro-text {
 }
 
 header .intro-text .intro-lead-in {
-    font-family: Voltaire;
-    font-style: italic;
+    font-family: arial;
     font-size: 22px;
     line-height: 22px;
     margin-bottom: 25px
@@ -90,7 +89,6 @@ header .intro-text .intro-heading {
     }
     header .intro-text .intro-lead-in {
         font-family: "Droid Serif", "Helvetica Neue", Helvetica, Arial, sans-serif;
-        font-style: italic;
         font-size: 40px;
         line-height: 40px;
         margin-bottom: 25px
@@ -215,7 +213,7 @@ img.grayscale {
 
 .blurb {
     padding: 120px 0;
-    background:#e3e3e3
+    background: #e3e3e3
 }
 
 .blurb .panel {
