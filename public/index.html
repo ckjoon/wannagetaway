@@ -79,25 +79,41 @@
             var date2 = new Date($("#date2").val());
             var d1 = date1.toISOString().slice(0, 10); 
             var d2 = date2.toISOString().slice(0, 10); 
+            var city1 = $("#city1").val()
+            var city2 = $("#city2").val()
             console.log(d1);
             console.log(d2);
+            var data1;
+            var data2;
 
-            var url1 = "https://api.sandbox.amadeus.com/v1.2/flights/inspiration-search?apikey=Bl4sjnCvGg6nf0cXksRrbVhczymgAQRo&origin=" + $("#city1").val() + "&max_price=" + $("#budget1").val() + "&date=" + d1 + "--" + d2;
-            var url2 = "https://api.sandbox.amadeus.com/v1.2/flights/inspiration-search?apikey=Bl4sjnCvGg6nf0cXksRrbVhczymgAQRo&origin=" + $("#city2").val() + "&max_price=" + $("#budget2").val() + "&date=" + d1 + "--" + d2;
+            var url1 = "https://api.sandbox.amadeus.com/v1.2/flights/inspiration-search?apikey=Bl4sjnCvGg6nf0cXksRrbVhczymgAQRo&origin=" + $("#city1").val() + "&max_price=" + $("#budget1").val() + "&departure_date=" + d1 + "--" + d2;
+            var url2 = "https://api.sandbox.amadeus.com/v1.2/flights/inspiration-search?apikey=Bl4sjnCvGg6nf0cXksRrbVhczymgAQRo&origin=" + $("#city2").val() + "&max_price=" + $("#budget2").val() + "&departure_date=" + d1 + "--" + d2;
+
 
 
             $.getJSON(url1, function (data) {
-                console.log(data);
-                firebase.database().ref("test1").set(data);
-            });
-            console.log(url1);
+                firebase.database().ref(city1).set(data);
+            })
             $.getJSON(url2, function (data) {
-                console.log(data);
-                firebase.database().ref("test2").set(data);
+                firebase.database().ref(city2).set(data);
+            })
 
+            firebase.database().ref(city1).once('value', function (snapshot) {
+                data1 = snapshot.val();
+            }).then(function () {
+                console.log(data1);
             });
 
-            console.log(url2);
+            firebase.database().ref(city2).once('value', function (snapshot) {
+                data2 = snapshot.val();
+            }).then(function () {
+                console.log(data2);
+            });
+            var array = [];
+            for (var i = 0; i < data.results.length; i++) {
+                console.log(data1.results[i]);
+            }
+
         }
     </script>
     <meta charset="utf-8">
