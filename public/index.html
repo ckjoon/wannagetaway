@@ -38,22 +38,7 @@
         }
 
 
-        $.getJSON('https://api.sandbox.amadeus.com/v1.2/flights/inspiration-search?apikey=Bl4sjnCvGg6nf0cXksRrbVhczymgAQRo&origin=BOS', function (data) {
-            console.log(data);
-            firebase.database().ref("test1").set(data);
-
-        });
-
-
         $(function () {
-            $('input[name="daterange"]').daterangepicker();
-        });
-
-        $(function () {
-            function log(message) {
-                $("<div>").text(message).prependTo("#log");
-                $("#log").scrollTop(0);
-            }
             $("#city1").autocomplete({
                 source: function (request, response) {
                     $.ajax({
@@ -68,18 +53,7 @@
                         }
                     });
                 },
-                minLength: 3,
-                select: function (event, ui) {
-                    log(ui.item ?
-                        "Selected: " + ui.item.label :
-                        "Nothing selected, input was " + this.value);
-                },
-                open: function () {
-                    $(this).removeClass("ui-corner-all").addClass("ui-corner-top");
-                },
-                close: function () {
-                    $(this).removeClass("ui-corner-top").addClass("ui-corner-all");
-                }
+                minLength: 3
             })
             $("#city2").autocomplete({
                 source: function (request, response) {
@@ -95,20 +69,36 @@
                         }
                     });
                 },
-                minLength: 3,
-                select: function (event, ui) {
-                    log(ui.item ?
-                        "Selected: " + ui.item.label :
-                        "Nothing selected, input was " + this.value);
-                },
-                open: function () {
-                    $(this).removeClass("ui-corner-all").addClass("ui-corner-top");
-                },
-                close: function () {
-                    $(this).removeClass("ui-corner-top").addClass("ui-corner-all");
-                }
+                minLength: 3
             });
         });
+
+
+        function myFunction() {
+            var date1 = new Date($("#date1").val());
+            var date2 = new Date($("#date2").val());
+            var d1 = date1.toISOString().slice(0, 10); 
+            var d2 = date2.toISOString().slice(0, 10); 
+            console.log(d1);
+            console.log(d2);
+
+            var url1 = "https://api.sandbox.amadeus.com/v1.2/flights/inspiration-search?apikey=Bl4sjnCvGg6nf0cXksRrbVhczymgAQRo&origin=" + $("#city1").val() + "&max_price=" + $("#budget1").val() + "&date=" + d1 + "--" + d2;
+            var url2 = "https://api.sandbox.amadeus.com/v1.2/flights/inspiration-search?apikey=Bl4sjnCvGg6nf0cXksRrbVhczymgAQRo&origin=" + $("#city2").val() + "&max_price=" + $("#budget2").val() + "&date=" + d1 + "--" + d2;
+
+
+            $.getJSON(url1, function (data) {
+                console.log(data);
+                firebase.database().ref("test1").set(data);
+            });
+            console.log(url1);
+            $.getJSON(url2, function (data) {
+                console.log(data);
+                firebase.database().ref("test2").set(data);
+
+            });
+
+            console.log(url2);
+        }
     </script>
     <meta charset="utf-8">
     <title>Welcome to Firebase Hosting</title>
@@ -123,34 +113,31 @@
 
     <div class="container">
         <div class="row">
-            <form role="form">
-                <div class="col-sm-5 col-md-4 col-lg-3">
-                    <div class="form-group">
-                        <label for="city1">Your City:</label>
-                        <input type="text" class="form-control" id="city1" placeholder="ATL">
-                    </div>
-                </div>
-                <div class="col-sm-5 col-md-4 col-lg-3">
-                    <div class="form-group">
-                        <label for="city2">Your Friend's City:</label>
-                        <input type="text" class="form-control" id="city2" placeholder="SEA">
-                    </div>
-                </div>
-                <div class="col-sm-2 col-md-4 col-lg-3">
-                    <div class="form-group">
-                        <label for="date">Departure Date :</label>
-                        <input type="text" name="daterange" class="form-control" placeholder="Select Date" />
-                    </div>
-                </div>
-                <div>
-                    Powered by <a href="http://sandbox.amadeus.com">Amadeus Travel Innovation Sandbox</a>
-                </div>
-                <div class="ui-widget" style="margin-top:2em; font-family:Arial">
-                    Result:
-                    <div id="log" style="height: 200px; width: 300px; overflow: auto;" class="ui-widget-content"></div>
-                </div>
+            <div class="col-sm-5 col-md-4 col-lg-4">
+                <label for="city1">Your City:</label>
+                <input type="text" class="form-control" id="city1" placeholder="ATL">
+                <label for="city1">Your Budget($):</label>
+                <input type="number" class="form-control" id="budget1">
 
-            </form>
+
+            </div>
+            <div class="col-sm-5 col-md-4 col-lg-4">
+                <label for="city2">Friend's city:</label>
+                <input type="text" class="form-control" id="city2" placeholder="SEA">
+                <label for="money2">Friend's Budget($):</label>
+                <input type="number" class="form-control" id="budget2">
+
+            </div>
+            <div class="col-sm-5 col-md-4 col-lg-4">
+                <label for="date1">Departure Date :</label>
+                <input type="date" id="date1" name="daterange" class="form-control" />
+                <label for="date2">Return Date :</label>
+                <input type="date" id="date2" name="daterange" class="form-control" />
+            </div>
+        </div>
+        <div class="row">
+
+            <button style="margin:10px" type="button" class="btn btn-primary btn-lg btn-block" onclick="myFunction();">Find Midfare</button>
         </div>
     </div>
 
